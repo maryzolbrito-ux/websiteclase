@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tienda Michael Kors - Marisol</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- React 18 CDN -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+</head>
+<body>
+
+<div id="root"></div>
+
+<script>
+const { useState, useMemo, useEffect } = React;
+
+/* ================= PRODUCTS ================= */
+const PRODUCTS = [
+  {
+    id: 1,
+    name: "Jet Set Travel Tote",
+    price: 298,
+    category: "Tote",
+    img: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    id: 2,
+    name: "Voyager Medium Tote",
+    price: 268,
+    category: "Tote",
+    img: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    id: 3,
+    name: "Hamilton Leather Satchel",
+    price: 348,
+    category: "Satchel",
+    img: "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    id: 4,
+    name: "Empire Large Tote",
+    price: 378,
+    category: "Tote",
+    img: "https://images.unsplash.com/photo-1594223274512-ad4803739b7c?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    id: 5,
+    name: "Greenwich Crossbody Bag",
+    price: 198,
+    category: "Crossbody",
+    img: "https://images.unsplash.com/photo-1614179689702-355944cd0918?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    id: 6,
+    name: "Jet Set Small Crossbody",
+    price: 168,
+    category: "Crossbody",
+    img: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    id: 7,
+    name: "Chantal Large Tote",
+    price: 328,
+    category: "Tote",
+    img: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    id: 8,
+    name: "Eva Signature Tote",
+    price: 198,
+    category: "Tote",
+    img: "https://images.unsplash.com/photo-1594223274512-ad4803739b7c?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    id: 9,
+    name: "Mila Small Satchel",
+    price: 298,
+    category: "Satchel",
+    img: "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    id: 10,
+    name: "Bradshaw Shoulder Bag",
+    price: 278,
+    category: "Shoulder",
+    img: "https://i5.walmartimages.com/seo/Michael-Kors-Women-s-Bradshaw-Small-Logo-Convertible-Shoulder-Bag-Brown-Acorn_73462c53-616f-49d1-8de5-db8031879fed.d88f2fd0df150b50fdafaee1f11ebb9d.jpeg"
+  }
+];
+
+/* ================= APP ================= */
+function App() {
+  const [cart, setCart] = useState([]);
+  const [category, setCategory] = useState("All");
+  const [cartOpen, setCartOpen] = useState(false);
+  const [search, setSearch] = useState("");
+
+  /* Nombre del usuario */
+  const [nombre, setNombre] = useState("");
+
+  /* Pedir nombre al iniciar */
+  useEffect(() => {
+    const nombreIngresado = prompt("¿Cuál es tu nombre?");
+    if (nombreIngresado) {
+      setNombre(nombreIngresado);
+    }
+  }, []);
+
+  const categories = ["All", ...new Set(PRODUCTS.map(p => p.category))];
+  const cartCount = cart.reduce((s,i)=>s+i.qty,0);
+
+  function addToCart(product) {
+    setCart(prev => {
+      const found = prev.find(i => i.id === product.id);
+      return found
+        ? prev.map(i =>
+            i.id === product.id ? { ...i, qty: i.qty + 1 } : i
+          )
+        : [...prev, { ...product, qty: 1 }];
+    });
+  }
+
+  function removeItem(id) {
+    setCart(prev => prev.filter(i => i.id !== id));
+  }
+
+  function checkout() {
+    if (cart.length === 0) {
+      alert("Tu carrito está vacío.");
+      return;
+    }
+    alert("✅ Compra completada.\n\n¡Gracias por tu compra!");
+    setCart([]);
+    setCartOpen(false);
+  }
+
+  const filtered = PRODUCTS
+    .filter(p => (category === "All" ? true : p.category === category))
+    .filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
+
+  const total = useMemo(
+    () => cart.reduce((sum,i)=>sum+i.price*i.qty,0),
+    [cart]
+  );
+
+  return React.createElement(
+    "div",
+    null,
+
+    /* ===== HEADER ===== */
+    React.createElement(
+      "header",
+      { className:"header", style:{ display:"flex", alignItems:"center", justifyContent:"space-between" } },
+
+      /* Izquierda */
+      React.createElement(
+        "div",
+        { className:"brand" },
+        "MICHAEL KORS BY MARISOL"
+      ),
+
+      /* Centro */
+      React.createElement(
+        "div",
+        { style:{ fontWeight:"bold", textAlign:"center" } },
+        nombre ? `Bienvenido, ${nombre}` : ""
+      ),
+
+      /* Derecha */
+      React.createElement(
+        "button",
+        { className:"cart-btn", onClick:()=>setCartOpen(!cartOpen) },
+        `👜 Carrito (${cartCount})`
+      )
+    ),
+
+    /* ===== BUSCADOR ===== */
+    React.createElement(
+      "div",
+      { className:"filters" },
+      React.createElement("input", {
+        type: "text",
+        placeholder: "Buscar bolsa...",
+        value: search,
+        onChange: (e) => setSearch(e.target.value),
+        style: { padding: "8px", width: "260px" }
+      })
+    ),
+
+    /* ===== FILTROS ===== */
+    React.createElement(
+      "div",
+      { className:"filters" },
+      categories.map(c =>
+        React.createElement(
+          "button",
+          {
+            key:c,
+            className: category===c ? "filter active" : "filter",
+            onClick:()=>setCategory(c)
+          },
+          c === "All" ? "Todas" : c
+        )
+      )
+    ),
+
+    /* ===== PRODUCTOS ===== */
+    React.createElement(
+      "section",
+      { className:"products" },
+      filtered.map(p =>
+        React.createElement(
+          "div",
+          { className:"product", key:p.id },
+          React.createElement("img", { src:p.img, alt:p.name }),
+          React.createElement("h3", null, p.name),
+          React.createElement("p", null, `$${p.price}`),
+          React.createElement(
+            "button",
+            { onClick:()=>addToCart(p) },
+            "Agregar al carrito"
+          )
+        )
+      )
+    ),
+
+    /* ===== CARRITO ===== */
+    React.createElement(
+      "aside",
+      { className: cartOpen ? "cart open" : "cart" },
+      React.createElement("h2", null, "Carrito"),
+
+      cart.length === 0
+        ? React.createElement("p", { className:"muted" }, "El carrito está vacío")
+        : cart.map(i =>
+            React.createElement(
+              "div",
+              { className:"cart-item", key:i.id },
+              React.createElement("span", null, `${i.name} x${i.qty}`),
+              React.createElement("span", null, `$${i.price*i.qty}`),
+              React.createElement(
+                "button",
+                { onClick:()=>removeItem(i.id) },
+                "✕"
+              )
+            )
+          ),
+
+      React.createElement(
+        "div",
+        { className:"cart-total" },
+        `Total: $${total}`
+      ),
+
+      React.createElement(
+        "button",
+        { className:"checkout-btn", onClick:checkout },
+        "Finalizar compra"
+      )
+    )
+  );
+}
+
+/* ===== RENDER ===== */
+ReactDOM.createRoot(document.getElementById("root"))
+  .render(React.createElement(App));
+</script>
+
+</body>
+</html>

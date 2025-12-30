@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Michael Kors Bags</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- React CDN -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+</head>
+<body>
+
+<header class="header">
+  <div class="brand">MICHAEL KORS</div>
+  <button class="cart-btn" id="cartBtn">
+    👜 Cart (<span id="cartCount">0</span>)
+  </button>
+</header>
+
+<main id="root"></main>
+
+<script>
+const { useState, useMemo } = React;
+
+/* ================== PRODUCTS (20) ================== */
+const PRODUCTS = [
+  { id:1, name:"Jet Set Travel Tote", price:298, category:"Tote",
+    img:"https://images.unsplash.com/photo-1584917865442-de89df76afd3" },
+
+  { id:2, name:"Voyager Medium Tote", price:268, category:"Tote",
+    img:"https://images.unsplash.com/photo-1594223274512-ad4803739b7c" },
+
+  { id:3, name:"Hamilton Legacy Satchel", price:348, category:"Satchel",
+    img:"https://images.unsplash.com/photo-1600185365483-26d7a4cc7519" },
+
+  { id:4, name:"Mercer Gallery Bag", price:228, category:"Satchel",
+    img:"https://images.unsplash.com/photo-1590874103328-eac38a683ce7" },
+
+  { id:5, name:"Soho Quilted Shoulder", price:398, category:"Shoulder",
+    img:"https://images.unsplash.com/photo-1618354691373-d851c5c3a990" },
+
+  { id:6, name:"Lillie Chain Shoulder", price:248, category:"Shoulder",
+    img:"https://images.unsplash.com/photo-1605733160314-4fc7dac4bb16" },
+
+  { id:7, name:"Empire Medium Tote", price:378, category:"Tote",
+    img:"https://images.unsplash.com/photo-1593032465175-481ac7f401a0" },
+
+  { id:8, name:"Suri Bucket Bag", price:278, category:"Bucket",
+    img:"https://images.unsplash.com/photo-1595341888016-a392ef81b7de" },
+
+  { id:9, name:"Greenwich Crossbody", price:198, category:"Crossbody",
+    img:"https://images.unsplash.com/photo-1614179689702-355944cd0918" },
+
+  { id:10, name:"Jet Set Crossbody", price:168, category:"Crossbody",
+    img:"https://images.unsplash.com/photo-1600180758890-6b94519a8ba6" },
+
+  { id:11, name:"Scarlett Satchel", price:248, category:"Satchel",
+    img:"https://images.unsplash.com/photo-1584917865442-de89df76afd3" },
+
+  { id:12, name:"Chantal Large Tote", price:328, category:"Tote",
+    img:"https://images.unsplash.com/photo-1594223274512-ad4803739b7c" },
+
+  { id:13, name:"Eva Large Tote", price:198, category:"Tote",
+    img:"https://images.unsplash.com/photo-1593032465175-481ac7f401a0" },
+
+  { id:14, name:"Mila Small Satchel", price:298, category:"Satchel",
+    img:"https://images.unsplash.com/photo-1600185365483-26d7a4cc7519" },
+
+  { id:15, name:"Bradshaw Shoulder Bag", price:278, category:"Shoulder",
+    img:"https://images.unsplash.com/photo-1605733160314-4fc7dac4bb16" },
+
+  { id:16, name:"Heather Medium Tote", price:248, category:"Tote",
+    img:"https://images.unsplash.com/photo-1594223274512-ad4803739b7c" },
+
+  { id:17, name:"Rhea Zip Backpack", price:298, category:"Backpack",
+    img:"https://images.unsplash.com/photo-1618354691373-d851c5c3a990" },
+
+  { id:18, name:"Slater Sling Pack", price:198, category:"Backpack",
+    img:"https://images.unsplash.com/photo-1595341888016-a392ef81b7de" },
+
+  { id:19, name:"Jet Set Camera Bag", price:178, category:"Crossbody",
+    img:"https://images.unsplash.com/photo-1590874103328-eac38a683ce7" },
+
+  { id:20, name:"Lena Mini Bucket", price:168, category:"Bucket",
+    img:"https://images.unsplash.com/photo-1595341888016-a392ef81b7de" }
+];
+
+/* ================== APP ================== */
+function App() {
+  const [cart, setCart] = useState([]);
+  const [category, setCategory] = useState("All");
+
+  const categories = ["All", ...new Set(PRODUCTS.map(p => p.category))];
+
+  function addToCart(product) {
+    setCart(prev => {
+      const found = prev.find(i => i.id === product.id);
+      if (found) {
+        return prev.map(i =>
+          i.id === product.id ? { ...i, qty: i.qty + 1 } : i
+        );
+      }
+      return [...prev, { ...product, qty: 1 }];
+    });
+  }
+
+  function removeItem(id) {
+    setCart(prev => prev.filter(i => i.id !== id));
+  }
+
+  const filteredProducts =
+    category === "All"
+      ? PRODUCTS
+      : PRODUCTS.filter(p => p.category === category);
+
+  const total = useMemo(
+    () => cart.reduce((sum, i) => sum + i.price * i.qty, 0),
+    [cart]
+  );
+
+  document.getElementById("cartCount").textContent =
+    cart.reduce((sum, i) => sum + i.qty, 0);
+
+  return React.createElement(
+    "div",
+    null,
+
+    React.createElement(
+      "div",
+      { className: "filters" },
+      categories.map(c =>
+        React.createElement(
+          "button",
+          {
+            key: c,
+            className: category === c ? "filter active" : "filter",
+            onClick: () => setCategory(c)
+          },
+          c
+        )
+      )
+    ),
+
+    React.createElement(
+      "section",
+      { className: "products" },
+      filteredProducts.map(p =>
+        React.createElement(
+          "div",
+          { className: "product", key: p.id },
+          React.createElement("img", { src: p.img, alt: p.name }),
+          React.createElement("h3", null, p.name),
+          React.createElement("p", null, `$${p.price}`),
+          React.createElement(
+            "button",
+            { onClick: () => addToCart(p) },
+            "Add to Cart"
+          )
+        )
+      )
+    ),
+
+    React.createElement(
+      "aside",
+      { className: "cart" },
+      React.createElement("h2", null, "Cart"),
+      cart.length === 0
+        ? React.createElement("p", { className: "muted" }, "Cart is empty")
+        : cart.map(i =>
+            React.createElement(
+              "div",
+              { className: "cart-item", key: i.id },
+              React.createElement("span", null, `${i.name} x${i.qty}`),
+              React.createElement("span", null, `$${i.price * i.qty}`),
+              React.createElement(
+                "button",
+                { onClick: () => removeItem(i.id) },
+                "✕"
+              )
+            )
+          ),
+      React.createElement(
+        "div",
+        { className: "cart-total" },
+        `Total: $${total}`
+      )
+    )
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root"))
+  .render(React.createElement(App));
+
+document.getElementById("cartBtn").onclick = () => {
+  document.querySelector(".cart").classList.toggle("open");
+};
+</script>
+
+</body>
+</html>

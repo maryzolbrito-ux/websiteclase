@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Michael Kors Bags</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- React (no build step) -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+</head>
+<body>
+
+  <header class="header">
+    <div class="brand">MICHAEL KORS</div>
+    <button class="cart-btn" id="cartBtn">
+      👜 Cart (<span id="cartCount">0</span>)
+    </button>
+  </header>
+
+  <main id="root"></main>
+
+  <script>
+    const { useState, useMemo } = React;
+
+    const PRODUCTS = [
+      { id: 1, name: "Jet Set Tote", price: 298 },
+      { id: 2, name: "Hamilton Satchel", price: 348 },
+      { id: 3, name: "Mercer Gallery Bag", price: 228 },
+      { id: 4, name: "Soho Quilted Bag", price: 398 }
+    ];
+
+    function App() {
+      const [cart, setCart] = useState([]);
+      const [open, setOpen] = useState(false);
+
+      function addToCart(product) {
+        setCart(prev => {
+          const found = prev.find(i => i.id === product.id);
+          if (found) {
+            return prev.map(i =>
+              i.id === product.id ? { ...i, qty: i.qty + 1 } : i
+            );
+          }
+          return [...prev, { ...product, qty: 1 }];
+        });
+      }
+
+      function removeItem(id) {
+        setCart(prev => prev.filter(i => i.id !== id));
+      }
+
+      const total = useMemo(() =>
+        cart.reduce((sum, i) => sum + i.price * i.qty, 0),
+        [cart]
+      );
+
+      document.getElementById("cartCount").textContent =
+        cart.reduce((s, i) => s + i.qty, 0);
+
+      return React.createElement(
+        React.Fragment,
+        null,
+
+        React.createElement(
+          "section",
+          { className: "products" },
+          PRODUCTS.map(p =>
+            React.createElement(
+              "div",
+              { className: "product", key: p.id },
+              React.createElement("h3", null, p.name),
+              React.createElement("p", null, `$${p.price}`),
+              React.createElement(
+                "button",
+                { onClick: () => addToCart(p) },
+                "Add to Cart"
+              )
+            )
+          )
+        ),
+
+        React.createElement(
+          "aside",
+          { className: open ? "cart open" : "cart" },
+          React.createElement("h2", null, "Your Cart"),
+
+          cart.length === 0
+            ? React.createElement("p", { className: "muted" }, "Cart is empty")
+            : cart.map(i =>
+                React.createElement(
+                  "div",
+                  { className: "cart-item", key: i.id },
+                  React.createElement(
+                    "span",
+                    null,
+                    `${i.name} x${i.qty}`
+                  ),
+                  React.createElement(
+                    "span",
+                    null,
+                    `$${i.price * i.qty}`
+                  ),
+                  React.createElement(
+                    "button",
+                    { onClick: () => removeItem(i.id) },
+                    "✕"
+                  )
+                )
+              ),
+
+          React.createElement(
+            "div",
+            { className: "cart-total" },
+            `Total: $${total}`
+          )
+        )
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(React.createElement(App));
+
+    document.getElementById("cartBtn").onclick = () => {
+      document.querySelector(".cart").classList.toggle("open");
+    };
+  </script>
+
+</body>
+</html>
