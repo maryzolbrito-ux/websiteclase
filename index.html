@@ -6,11 +6,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body{margin:0;font-family:Arial,sans-serif;background:#f2f2f2}
+body{margin:0;font-family:Arial,sans-serif;background:white}
 .header{background:white;display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid #ddd;position:sticky;top:0;z-index:10}
 .brand{font-weight:700;font-size:14px;white-space:nowrap}
 .center{flex:1;text-align:center;font-size:14px;font-weight:600}
+.right{display:flex;align-items:center;gap:10px}
 .cart-btn{border:1px solid #ddd;background:#111;color:white;padding:10px 12px;border-radius:8px;cursor:pointer;font-weight:600}
+.color-btn{border:1px solid #ccc;background:white;padding:6px 10px;border-radius:8px;cursor:pointer;font-size:12px}
 .filters{display:flex;gap:10px;padding:14px 18px;flex-wrap:wrap;align-items:center;justify-content:center}
 .filter{border:1px solid #ddd;background:white;padding:8px 12px;border-radius:10px;cursor:pointer;font-weight:600}
 .filter.active{background:#111;color:white;border-color:#111}
@@ -41,6 +43,7 @@ body{margin:0;font-family:Arial,sans-serif;background:#f2f2f2}
 
 <script>
 const{useState,useMemo,useEffect}=React
+const COLOR_DEFAULT="white"
 
 const PRODUCTS=[
 {id:1,name:"Jet Set Travel Tote",price:298,category:"Tote",img:"https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=800&q=80"},
@@ -65,6 +68,9 @@ const[search,setSearch]=useState("")
 const[nombre,setNombre]=useState("")
 const[mensaje,setMensaje]=useState("")
 const[preguntaGenero,setPreguntaGenero]=useState(true)
+const[color,setColor]=useState(COLOR_DEFAULT)
+
+useEffect(()=>{document.body.style.background=color},[color])
 
 useEffect(()=>{
 const n=prompt("¿Cuál es tu nombre?")
@@ -122,7 +128,13 @@ cartOpen&&React.createElement("div",{className:"overlay",onClick:()=>setCartOpen
 React.createElement("header",{className:"header"},
 React.createElement("div",{className:"brand"},"MICHAEL KORS BY MARISOL"),
 React.createElement("div",{className:"center"},mensaje),
+React.createElement("div",{className:"right"},
+React.createElement("span",null,"SELECCIONE COLOR DE FONDO"),
+React.createElement("button",{className:"color-btn",onClick:()=>setColor("#f2f2f2")},"Gris"),
+React.createElement("button",{className:"color-btn",onClick:()=>setColor("#e6f0ff")},"Azul"),
+React.createElement("button",{className:"color-btn",onClick:()=>setColor("#e8f6ee")},"Verde"),
 React.createElement("button",{className:"cart-btn",onClick:()=>setCartOpen(true)},`👜 Carrito (${cart.reduce((s,i)=>s+i.qty,0)})`)
+)
 ),
 
 React.createElement("div",{className:"filters"},
@@ -135,7 +147,7 @@ categories.map(c=>React.createElement("button",{key:c,className:category===c?"fi
 
 React.createElement("section",{className:"products"},
 filtered.map(p=>React.createElement("div",{className:"product",key:p.id},
-React.createElement("img",{src:p.img,alt:p.name}),
+React.createElement("img",{src:p.img}),
 React.createElement("h3",null,p.name),
 React.createElement("p",null,`$${p.price}`),
 React.createElement("button",{onClick:()=>addToCart(p)},"Agregar al carrito")
